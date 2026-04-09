@@ -18,8 +18,8 @@ module "alb" {
   listeners = {
     # Listener-1: my-http-listener
     my-http-listener = {
-      port     = 80
-      protocol = "HTTP"
+      port     = 443
+      protocol = "HTTPS"
       forward = {
         target_group_key = "mytg1"
       }         
@@ -35,8 +35,8 @@ module "alb" {
       ## Search for "create_attachment" to jump to that Github issue solution
       create_attachment = false
       name_prefix                       = "mytg1-"
-      protocol                          = "HTTP"
-      port                              = 80
+      protocol                          = "HTTPS"
+      port                              = 443
       target_type                       = "instance"
       deregistration_delay              = 10
       load_balancing_cross_zone_enabled = false
