@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BearsPortal - Schedule</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="paws-logo">🐾</div>
+
+<script>
+  var studentName = sessionStorage.getItem('studentName');
+  if (!studentName) window.location.href = 'login.html';
+</script>
+
+<!-- PORTAL -->
+<div id="portal-screen">
+  <h1>BearsPortal</h1>
+  <p style="text-align:center;">Welcome, <b id="display-name"></b> &nbsp;|&nbsp; Summer 2026 &nbsp;|&nbsp; <a href="#" onclick="doLogout()">Sign Out</a></p>
+  <hr>
+
+  <div class="section-box">
+    <h2>My Schedule</h2>
+    <p>Total Credits Enrolled: <b id="credit-count">0</b> / 18</p>
+    <p id="conflict-warning" class="error-text" style="display:none;">⚠ WARNING: You have a time conflict in your schedule!</p>
+    <table id="enrolled-table">
+      <tr>
+        <th>Code</th><th>Course Name</th><th>Time</th><th>Instructor</th><th>Credits</th><th>Action</th>
+      </tr>
+      <tr>
+        <td colspan="6" style="text-align:center; color:gray;">No courses enrolled yet.</td>
+      </tr>
+    </table>
+    <br>
+    <button onclick="goToConfirm()">Go to Confirm Page</button>
+  </div>
+
+  <div class="section-box">
+    <h2>Course Catalog</h2>
+    Search: <input type="text" id="search-input" placeholder="Search by name or code..." oninput="renderCatalog()">
+    &nbsp;
+    Department:
+    <select id="dept-filter" onchange="renderCatalog()">
+      <option value="">All</option>
+      <option value="CS">CS</option>
+      <option value="MATH">MATH</option>
+      <option value="ENG">ENG</option>
+      <option value="BIO">BIO</option>
+      <option value="HIST">HIST</option>
+      <option value="PSYC">PSYC</option>
+    </select>
+    <br><br>
+    <table id="catalog-table">
+      <tr>
+        <th>Code</th><th>Course Name</th><th>Time</th><th>Instructor</th><th>Credits</th><th>Seats</th><th>Action</th>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div id="confirm-screen" style="display:none;">
+  <h1>BearsPortal</h1>
+  <p style="text-align:center;">Welcome, <b id="display-name2"></b> &nbsp;|&nbsp; Summer 2026 &nbsp;|&nbsp; <a href="#" onclick="doLogout()">Sign Out</a></p>
+  <hr>
+
+  <div class="section-box">
+    <h2>Confirm Course Registration</h2>
+    <p>Please review your courses below before confirming.</p>
+    <p id="success-msg" class="success-text" style="display:none;">✓ Registration confirmed! Your courses have been added.</p>
+    <table id="confirm-table">
+      <tr>
+        <th>Code</th><th>Course Name</th><th>Time</th><th>Instructor</th><th>Credits</th>
+      </tr>
+    </table>
+    <br>
+    <p>Total Credits: <b id="confirm-credits">0</b></p>
+    <br>
+    <button onclick="goBack()">← Back</button>
+    &nbsp;
+    <button id="btn-confirm" onclick="confirmRegistration()">Confirm Registration</button>
+  </div>
+</div>
+
+<script>
+var COURSES = [
+  { code:"CS 101",   name:"Intro to Computer Science",    credits:3, dept:"CS",   time:"MWF 9:00-9:50am",       seats:4,  instructor:"Dr. Park" },
+  { code:"CS 201",   name:"Data Structures",              credits:3, dept:"CS",   time:"TTh 10:30-11:45am",     seats:2,  instructor:"Dr. Nguyen" },
+  { code:"CS 315",   name:"Algorithms",                   credits:3, dept:"CS",   time:"MWF 1:00-1:50pm",       seats:0,  instructor:"Prof. Kim" },
+  { code:"CS 410",   name:"Operating Systems",            credits:3, dept:"CS",   time:"TTh 2:00-3:15pm",       seats:6,  instructor:"Dr. Okafor" },
+  { code:"MATH 140", name:"Calculus I",                   credits:4, dept:"MATH", time:"MWF 8:00-8:50am",       seats:10, instructor:"Prof. Reyes" },
+  { code:"MATH 240", name:"Linear Algebra",               credits:3, dept:"MATH", time:"TTh 9:00-10:15am",      seats:5,  instructor:"Dr. Patel" },
+  { code:"MATH 310", name:"Probability & Statistics",     credits:3, dept:"MATH", time:"MWF 11:00-11:50am",     seats:3,  instructor:"Dr. Chen" },
+  { code:"ENG 101",  name:"Composition & Rhetoric",       credits:3, dept:"ENG",  time:"MWF 10:00-10:50am",     seats:8,  instructor:"Prof. Harris" },
+  { code:"ENG 250",  name:"World Literature",             credits:3, dept:"ENG",  time:"TTh 1:00-2:15pm",       seats:12, instructor:"Prof. Thompson" },
+  { code:"BIO 110",  name:"General Biology I",            credits:4, dept:"BIO",  time:"MWF 9:00-9:50am + Lab", seats:7,  instructor:"Dr. Morales" },
+  { code:"BIO 220",  name:"Cell & Molecular Biology",     credits:3, dept:"BIO",  time:"TTh 11:00-12:15pm",     seats:0,  instructor:"Dr. Wilson" },
+  { code:"HIST 101", name:"World History I",              credits:3, dept:"HIST", time:"MWF 2:00-2:50pm",       seats:20, instructor:"Prof. Adams" },
+  { code:"HIST 305", name:"Modern American History",      credits:3, dept:"HIST", time:"TTh 3:30-4:45pm",       seats:9,  instructor:"Dr. Brown" },
+  { code:"PSYC 100", name:"Intro to Psychology",          credits:3, dept:"PSYC", time:"MWF 12:00-12:50pm",     seats:15, instructor:"Prof. Lee" },
+  { code:"PSYC 215", name:"Developmental Psychology",     credits:3, dept:"PSYC", time:"TTh 8:00-9:15am",       seats:6,  instructor:"Dr. Martinez" }
+];
+
+var enrolled = [];
+
+document.getElementById('display-name').textContent  = studentName;
+document.getElementById('display-name2').textContent = studentName;
+renderAll();
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+
+function doLogout() {
+  sessionStorage.removeItem('studentName');
+  window.location.href = 'login.html';
+}
+
+// ── Screen switching ──────────────────────────────────────────────────────────
+
+function goToConfirm() {
+  if (enrolled.length === 0) { alert('No courses selected yet. Add courses from the catalog first.'); return; }
+  renderConfirm();
+  document.getElementById('success-msg').style.display    = 'none';
+  document.getElementById('btn-confirm').disabled          = false;
+  document.getElementById('portal-screen').style.display  = 'none';
+  document.getElementById('confirm-screen').style.display = 'block';
+}
+
+function goBack() {
+  document.getElementById('confirm-screen').style.display = 'none';
+  document.getElementById('portal-screen').style.display  = 'block';
+}
+
+function confirmRegistration() {
+  document.getElementById('success-msg').style.display = 'block';
+  document.getElementById('btn-confirm').disabled = true;
+}
+
+// ── Time overlap logic ────────────────────────────────────────────────────────
+
+function toMinutes(timeStr, period) {
+  var parts = timeStr.split(':');
+  var h = parseInt(parts[0]);
+  var m = parseInt(parts[1]);
+  if (period === 'pm' && h !== 12) h += 12;
+  if (period === 'am' && h === 12) h = 0;
+  return h * 60 + m;
+}
+
+function parseCourseTime(timeStr) {
+  var cleaned = timeStr.replace(/\s*\+.*$/, '').trim();
+  var match = cleaned.match(/^([A-Za-z]+)\s+(\d+:\d+)[-–](\d+:\d+)(am|pm)/i);
+  if (!match) return null;
+  var endPer   = match[4].toLowerCase();
+  var endMin   = toMinutes(match[3], endPer);
+  var startMin = toMinutes(match[2], endPer);
+  if (startMin >= endMin) startMin = toMinutes(match[2], endPer === 'am' ? 'pm' : 'am');
+  return { days: match[1].replace(/Th/g, 'H').split(''), start: startMin, end: endMin };
+}
+
+function coursesOverlap(a, b) {
+  var ta = parseCourseTime(a.time);
+  var tb = parseCourseTime(b.time);
+  if (!ta || !tb) return false;
+  if (!ta.days.some(function(d) { return tb.days.indexOf(d) !== -1; })) return false;
+  return ta.start < tb.end && tb.start < ta.end;
+}
+
+function findAllConflicts(list) {
+  var conflicts = [];
+  for (var i = 0; i < list.length; i++)
+    for (var j = i + 1; j < list.length; j++)
+      if (coursesOverlap(list[i], list[j]))
+        conflicts.push({ a: list[i], b: list[j] });
+  return conflicts;
+}
+
+// ── Course actions ────────────────────────────────────────────────────────────
+
+function addCourse(code) {
+  var c = null;
+  for (var i = 0; i < COURSES.length; i++) if (COURSES[i].code === code) { c = COURSES[i]; break; }
+  if (!c) return;
+  for (var i = 0; i < enrolled.length; i++) if (enrolled[i].code === code) return;
+  var total = 0;
+  for (var i = 0; i < enrolled.length; i++) total += enrolled[i].credits;
+  if (total + c.credits > 18) { alert('Cannot add ' + code + ' - would exceed 18 credit limit.'); return; }
+  if (c.seats === 0) { alert('Cannot add ' + code + ' - no seats available.'); return; }
+  for (var i = 0; i < enrolled.length; i++) {
+    if (coursesOverlap(enrolled[i], c)) {
+      alert('Time Conflict: ' + code + ' overlaps with ' + enrolled[i].code + ' (' + enrolled[i].time + ').');
+      return;
+    }
+  }
+  enrolled.push(c);
+  renderAll();
+}
+
+function dropCourse(code) {
+  enrolled = enrolled.filter(function(x) { return x.code !== code; });
+  renderAll();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+
+function renderAll() { renderEnrolled(); renderCatalog(); }
+
+function renderEnrolled() {
+  var table = document.getElementById('enrolled-table');
+  var total = 0;
+  for (var i = 0; i < enrolled.length; i++) total += enrolled[i].credits;
+  document.getElementById('credit-count').textContent = total;
+
+  var conflicts = findAllConflicts(enrolled);
+  var conflictedCodes = {};
+  for (var i = 0; i < conflicts.length; i++) {
+    conflictedCodes[conflicts[i].a.code] = true;
+    conflictedCodes[conflicts[i].b.code] = true;
+  }
+  document.getElementById('conflict-warning').style.display = conflicts.length > 0 ? 'block' : 'none';
+
+  while (table.rows.length > 1) table.deleteRow(1);
+
+  if (enrolled.length === 0) {
+    var row = table.insertRow(-1);
+    var cell = row.insertCell(0);
+    cell.colSpan = 6; cell.style.textAlign = 'center'; cell.style.color = 'gray';
+    cell.textContent = 'No courses enrolled yet.';
+    return;
+  }
+  for (var i = 0; i < enrolled.length; i++) {
+    var c = enrolled[i];
+    var row = table.insertRow(-1);
+    if (conflictedCodes[c.code]) row.className = 'conflict-row';
+    row.insertCell(0).textContent = c.code;
+    row.insertCell(1).textContent = c.name;
+    row.insertCell(2).textContent = c.time;
+    row.insertCell(3).textContent = c.instructor;
+    row.insertCell(4).textContent = c.credits;
+    var btn = document.createElement('button');
+    btn.textContent = 'Drop'; btn.className = 'drop-btn';
+    btn.setAttribute('onclick', "dropCourse('" + c.code + "')");
+    row.insertCell(5).appendChild(btn);
+  }
+}
+
+function renderCatalog() {
+  var q     = document.getElementById('search-input').value.toLowerCase();
+  var dept  = document.getElementById('dept-filter').value;
+  var table = document.getElementById('catalog-table');
+  while (table.rows.length > 1) table.deleteRow(1);
+
+  var filtered = COURSES.filter(function(c) {
+    return (!q || c.code.toLowerCase().indexOf(q) !== -1 || c.name.toLowerCase().indexOf(q) !== -1)
+        && (!dept || c.dept === dept);
+  });
+
+  if (filtered.length === 0) {
+    var row = table.insertRow(-1);
+    var cell = row.insertCell(0);
+    cell.colSpan = 7; cell.style.textAlign = 'center'; cell.style.color = 'gray';
+    cell.textContent = 'No courses found.';
+    return;
+  }
+  for (var i = 0; i < filtered.length; i++) {
+    var c = filtered[i];
+    var isEnrolled  = enrolled.some(function(x) { return x.code === c.code; });
+    var hasConflict = !isEnrolled && enrolled.some(function(e) { return coursesOverlap(e, c); });
+    var noSeat = c.seats === 0;
+
+    var row = table.insertRow(-1);
+    row.insertCell(0).textContent = c.code;
+    row.insertCell(1).textContent = c.name;
+    row.insertCell(2).textContent = c.time;
+    row.insertCell(3).textContent = c.instructor;
+    row.insertCell(4).textContent = c.credits;
+
+    var seatsCell = row.insertCell(5);
+    seatsCell.innerHTML = noSeat ? '<span style="color:red;">Full</span>' : c.seats;
+
+    var actionCell = row.insertCell(6);
+    if (isEnrolled) {
+      actionCell.innerHTML = '<span style="color:green;">Enrolled</span>';
+    } else if (hasConflict) {
+      actionCell.innerHTML = '<span style="color:red;">Time Conflict</span>';
+    } else if (noSeat) {
+      actionCell.innerHTML = '<span style="color:gray;">No seats</span>';
+    } else {
+      var btn = document.createElement('button');
+      btn.textContent = 'Add';
+      btn.setAttribute('onclick', "addCourse('" + c.code + "')");
+      actionCell.appendChild(btn);
+    }
+  }
+}
+
+function renderConfirm() {
+  var table = document.getElementById('confirm-table');
+  while (table.rows.length > 1) table.deleteRow(1);
+  var total = 0;
+  for (var i = 0; i < enrolled.length; i++) total += enrolled[i].credits;
+  document.getElementById('confirm-credits').textContent = total;
+
+  if (enrolled.length === 0) {
+    var row = table.insertRow(-1);
+    var cell = row.insertCell(0);
+    cell.colSpan = 5; cell.style.textAlign = 'center';
+    cell.textContent = 'No courses selected.';
+    return;
+  }
+  for (var i = 0; i < enrolled.length; i++) {
+    var c = enrolled[i];
+    var row = table.insertRow(-1);
+    row.insertCell(0).textContent = c.code;
+    row.insertCell(1).textContent = c.name;
+    row.insertCell(2).textContent = c.time;
+    row.insertCell(3).textContent = c.instructor;
+    row.insertCell(4).textContent = c.credits;
+  }
+}
+</script>
+
+</body>
+</html>
