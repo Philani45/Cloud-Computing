@@ -1,0 +1,30 @@
+body {
+  background-color: #f5f0e8;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h1 { color: #3B1A06; text-align: center; }
+h2 { color: #3B1A06; }
+
+input, select { padding: 4px; margin: 4px; width: 200px; border: 1px solid #3B1A06; }
+
+button { padding: 6px 12px; margin: 4px; cursor: pointer; background-color: #F5B800; color: #3B1A06; border: 1px solid #3B1A06; font-weight: bold; }
+button:disabled { background-color: #aaaaaa; color: white; cursor: default; border-color: #999; }
+.drop-btn { background-color: #cc0000; color: white; border-color: #990000; }
+
+table { border-collapse: collapse; width: 100%; background-color: white; }
+th { background-color: #3B1A06; color: #F5B800; padding: 8px; border: 1px solid #3B1A06; text-align: left; }
+td { padding: 8px; border: 1px solid #c8b89a; }
+tr:nth-child(even) { background-color: #fdf7ee; }
+
+.error-text { color: red; font-weight: bold; }
+.success-text { color: green; font-weight: bold; }
+
+.login-box { width: 300px; margin: 80px auto; background-color: white; padding: 20px; border: 2px solid #3B1A06; text-align: center; }
+.section-box { background-color: white; border: 1px solid #3B1A06; padding: 15px; margin-bottom: 20px; }
+.conflict-row { background-color: #ffcccc !important; }
+
+#paws-logo { position: fixed; top: 12px; right: 16px; font-size: 28px; }
+
+a { color: #3B1A06; font-weight: bold; }
