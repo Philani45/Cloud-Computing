@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>BearsPortal Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="paws-logo">🐾</div>
+
+<div class="login-box">
+  <div style="font-size:36px;">🐾</div>
+  <h1>BearsPortal</h1>
+  <p>Student Registration System</p>
+  <hr>
+  <br>
+  <label><b>Student ID:</b></label><br>
+  <input type="text" id="sid" placeholder="e.g. 900123456"><br><br>
+  <label><b>Password:</b></label><br>
+  <input type="password" id="spw" placeholder="Enter password"><br><br>
+  <button onclick="doLogin()">Sign In</button>
+  <br>
+  <p id="login-error" class="error-text"></p>
+</div>
+
+<script>
+  document.getElementById('spw').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') doLogin();
+  });
+
+  function doLogin() {
+    var sid = document.getElementById('sid').value.trim();
+    var pw  = document.getElementById('spw').value.trim();
+    var err = document.getElementById('login-error');
+    if (sid === '') { err.textContent = 'Please enter your Student ID.'; return; }
+    if (pw === '')  { err.textContent = 'Please enter your password.';  return; }
+    err.textContent = '';
+    sessionStorage.setItem('studentName', 'John Smith - ' + sid);
+    window.location.href = 'schedule.html';
+  }
+</script>
+
+</body>
+</html>
