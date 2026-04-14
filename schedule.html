@@ -13,7 +13,7 @@
   if (!studentName) window.location.href = 'login.html';
 </script>
 
-<!-- PORTAL -->
+<!-- Portal -->
 <div id="portal-screen">
   <h1>BearsPortal</h1>
   <p style="text-align:center;">Welcome, <b id="display-name"></b> &nbsp;|&nbsp; Summer 2026 &nbsp;|&nbsp; <a href="#" onclick="doLogout()">Sign Out</a></p>
@@ -58,7 +58,7 @@
   </div>
 </div>
 
-<!-- CONFIRM -->
+<!-- Confirm  -->
 <div id="confirm-screen" style="display:none;">
   <h1>BearsPortal</h1>
   <p style="text-align:center;">Welcome, <b id="display-name2"></b> &nbsp;|&nbsp; Summer 2026 &nbsp;|&nbsp; <a href="#" onclick="doLogout()">Sign Out</a></p>
@@ -107,14 +107,14 @@ document.getElementById('display-name').textContent  = studentName;
 document.getElementById('display-name2').textContent = studentName;
 renderAll();
 
-// ── Auth ──────────────────────────────────────────────────────────────────────
+// Login with database info
 
 function doLogout() {
   sessionStorage.removeItem('studentName');
   window.location.href = 'login.html';
 }
 
-// ── Screen switching ──────────────────────────────────────────────────────────
+// Add courses
 
 function goToConfirm() {
   if (enrolled.length === 0) { alert('No courses selected yet. Add courses from the catalog first.'); return; }
@@ -135,7 +135,7 @@ function confirmRegistration() {
   document.getElementById('btn-confirm').disabled = true;
 }
 
-// ── Time overlap logic ────────────────────────────────────────────────────────
+// Time conflict
 
 function toMinutes(timeStr, period) {
   var parts = timeStr.split(':');
@@ -174,7 +174,7 @@ function findAllConflicts(list) {
   return conflicts;
 }
 
-// ── Course actions ────────────────────────────────────────────────────────────
+// Course alerts (no seats, cannot add, max credits.
 
 function addCourse(code) {
   var c = null;
@@ -200,7 +200,7 @@ function dropCourse(code) {
   renderAll();
 }
 
-// ── Render ────────────────────────────────────────────────────────────────────
+// Add Drop search filter
 
 function renderAll() { renderEnrolled(); renderCatalog(); }
 
