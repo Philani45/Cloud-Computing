@@ -123,7 +123,7 @@ Adjust network CIDR ranges in c4-01-vpc-variables.tf
 Update security rules in c5-* files
 Change ALB health check path in c11-02-ALB-application-loadbalancer.tf
 
-terraform destroy
+Terraform destroy
 
 Demo Implementation
 
