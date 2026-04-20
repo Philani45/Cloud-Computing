@@ -95,10 +95,15 @@ Before deploying the infrastructure, ensure the following tools and configuratio
   ```bash
   aws configure
 
-terraform init
-terraform plan
-terraform apply
-Validation
+Terraform init
+
+Tearrform validate
+
+Terraform plan
+
+Terraform apply
+
+
 
 After deployment, confirm that the system is functioning correctly:
 
